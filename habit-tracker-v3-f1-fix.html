@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Habitly – Habit Tracker</title>
+<meta name="theme-color" content="#6c5ce7">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Habitly">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%236c5ce7'/%3E%3Cpath d='M18 33l10 10 19-21' fill='none' stroke='white' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f4fb;--card:#fff;--ink:#1b1a2b;--mut:#6b6880;--line:#eceaf6;--acc:#6c5ce7;--acc2:#a78bfa;--ok:#22c55e;--bad:#f43f5e;--chip:#efedf9;--sh:0 6px 24px -10px rgba(60,40,140,.22)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#100f1a;--card:#1b1a2a;--ink:#f1effc;--mut:#9795b0;--line:#2a2840;--chip:#262439;--sh:0 6px 24px -10px rgba(0,0,0,.6)}}
+:root[data-theme="dark"]{--bg:#100f1a;--card:#1b1a2a;--ink:#f1effc;--mut:#9795b0;--line:#2a2840;--chip:#262439;--sh:0 6px 24px -10px rgba(0,0,0,.6)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0;background:var(--bg);color:var(--ink);font-family:'Plus Jakarta Sans',system-ui,sans-serif}
+#app{height:100%;max-width:480px;margin:0 auto;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);display:flex;flex-direction:column;position:relative;background:radial-gradient(120% 40% at 50% 0,color-mix(in srgb,var(--acc) 16%,transparent),transparent)}
+main{flex:1;overflow-y:auto;padding:22px 20px 28px;scrollbar-width:none}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;transition:transform .12s;touch-action:manipulation}
+button:active{transform:scale(.96)}
+h1{font-size:28px;margin:0;font-weight:800;letter-spacing:-.8px;line-height:1.15}
+h2{font-size:17px;margin:22px 0 12px;font-weight:800}
+.mut{color:var(--mut);font-size:13px;font-weight:500}
+.card{background:var(--card);border-radius:24px;padding:16px;box-shadow:var(--sh);margin-bottom:14px}
+.row{display:flex;align-items:center;gap:14px}.grow{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff;border-radius:28px;padding:22px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 18px 36px -16px var(--acc);margin:6px 0 20px}
+.hero .mut{color:#ffffffcc}.hero b{font-size:22px;font-weight:800;display:block;margin:4px 0 2px;letter-spacing:-.4px}
+.week{display:flex;gap:8px;margin-bottom:18px}
+.wd{flex:1;padding:10px 0;border-radius:18px;background:var(--card);box-shadow:var(--sh);text-align:center;font-size:11px;font-weight:600;color:var(--mut)}
+.wd b{display:block;font-size:17px;font-weight:800;color:var(--ink);margin-top:3px}
+.wd.on{background:var(--ink);color:var(--bg)}.wd.on b{color:var(--bg)}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 16px;scrollbar-width:none}
+.chip{background:var(--card);box-shadow:var(--sh);padding:10px 16px;border-radius:99px;font-size:13px;font-weight:700;white-space:nowrap;flex:none;color:var(--mut)}
+.chip.on{background:var(--acc);color:#fff}
+.ico{width:52px;height:52px;border-radius:18px;display:grid;place-items:center;font-size:25px;flex:none}
+.name{font-weight:700;font-size:15.5px}
+.chk{width:42px;height:42px;border-radius:50%;border:2.5px solid;display:grid;place-items:center;color:#fff;font-weight:800;font-size:18px;flex:none}
+.dots{width:36px;height:36px;border-radius:12px;font-size:20px;color:var(--mut)}
+.btn{padding:14px;border-radius:16px;background:var(--chip);font-weight:700;font-size:14px;width:100%;text-align:center}
+.btn.p{background:var(--acc);color:#fff;box-shadow:0 10px 22px -10px var(--acc)}.btn.danger{color:var(--bad)}
+.add{width:100%;padding:17px;border-radius:20px;background:var(--ink);color:var(--bg);font-weight:800;font-size:15px;margin-top:4px}
+nav{display:flex;margin:0 18px 14px;padding:8px;background:color-mix(in srgb,var(--card) 88%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-radius:26px;box-shadow:0 14px 34px -12px rgba(40,30,100,.35);border:1px solid var(--line)}
+nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;font-weight:700;color:var(--mut);padding:9px 4px;border-radius:19px}
+nav button.on{background:var(--acc);color:#fff}
+nav svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+input[type=text],input[type=email],textarea{width:100%;padding:16px;border-radius:18px;border:2px solid transparent;background:var(--card);box-shadow:var(--sh);color:var(--ink);font:inherit;font-size:15.5px;outline:none}
+input:focus,textarea:focus{border-color:var(--acc)}
+.l{display:block;font-size:12px;font-weight:800;color:var(--mut);text-transform:uppercase;letter-spacing:.8px;margin:24px 0 10px}
+.grid{display:flex;flex-wrap:wrap;gap:10px}
+.g{width:48px;height:48px;border-radius:16px;background:var(--card);box-shadow:var(--sh);font-size:23px;border:2.5px solid transparent}
+.g.on{border-color:var(--acc)}
+.sw{width:38px;height:38px;border-radius:50%;border:3px solid var(--bg);box-shadow:0 0 0 2px transparent}.sw.on{box-shadow:0 0 0 2.5px var(--ink)}
+.seg{display:flex;background:var(--chip);border-radius:18px;padding:5px}
+.seg button{flex:1;padding:12px 4px;border-radius:14px;font-size:13px;font-weight:700;color:var(--mut)}
+.seg button.on{background:var(--card);color:var(--ink);box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin:14px 0}
+.cal i{font-style:normal;text-align:center;font-size:10.5px;color:var(--mut);font-weight:700}
+.d{aspect-ratio:1;border-radius:10px;display:grid;place-items:center;font-size:11.5px;font-weight:700;background:var(--chip);color:var(--mut)}
+.d.ok{background:var(--ok);color:#fff}.d.no{background:var(--bad);color:#fff}.d.off{opacity:.4}.d.nx{opacity:.55}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.st{background:var(--chip);border-radius:16px;padding:12px 6px;text-align:center}
+.st b{display:block;font-size:21px;font-weight:800}.st span{font-size:10.5px;color:var(--mut);font-weight:600;line-height:1.3;display:block;margin-top:2px}
+.empty{text-align:center;padding:46px 20px;color:var(--mut);font-size:14px}.empty big{font-size:44px;display:block;margin-bottom:8px}
+.hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.back{width:42px;height:42px;border-radius:15px;background:var(--card);box-shadow:var(--sh);font-size:18px;font-weight:700}
+.sheetbg{cursor:pointer;position:absolute;inset:0;background:rgba(10,8,30,.45);display:flex;align-items:flex-end;z-index:20;animation:f .18s}
+.sheet{width:100%;background:var(--card);border-radius:28px 28px 0 0;padding:12px 20px calc(22px + env(safe-area-inset-bottom,0px));display:grid;gap:10px;animation:u .22s}
+.sheet .bar{width:42px;height:5px;border-radius:9px;background:var(--line);margin:0 auto 8px}
+.toast{position:absolute;left:50%;top:calc(16px + env(safe-area-inset-top,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:11px 18px;border-radius:99px;font-size:13px;font-weight:700;z-index:30;animation:f .2s;white-space:nowrap}
+.d.mini{background:color-mix(in srgb,var(--ok) 50%,var(--chip));color:#fff}.d.fz{background:#bfdbfe;color:#1e40af}
+.d.td{box-shadow:inset 0 0 0 2px var(--acc)}.d.td:not(.ok):not(.fz):not(.off){color:var(--ink)}.d.td.mini{box-shadow:inset 0 0 0 2px var(--acc)}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:9px 14px;border-radius:99px;font-size:12.5px;font-weight:700;background:#ffffff26;color:#fff;margin-top:12px}
+.mb{display:block;font-size:12px;font-weight:700;color:var(--acc);margin-top:6px;text-align:left}
+.tag{font-size:11.5px;font-weight:700;color:var(--acc);margin-top:3px}
+.ins{background:linear-gradient(135deg,#0ea5e9,var(--acc));color:#fff}.ins .mut{color:#ffffffcc}
+textarea.big{min-height:46vh;min-height:46dvh;resize:none;line-height:1.55}
+.nb{background:var(--chip);border-radius:14px;padding:12px;font-size:13px;white-space:pre-wrap;color:var(--mut)}
+textarea{resize:none}.mb.nt{color:var(--mut);font-weight:600;line-height:1.4}
+@keyframes f{from{opacity:0}}@keyframes u{from{transform:translateY(40px)}}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+input:focus-visible,textarea:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="app"><main id="main"></main><nav id="nav" aria-label="Navigasi utama"></nav><div id="ov"></div></div>
+<script>
+const ICONS=['💧','📖','🏃','🧘','💪','🥗','😴','✍️','🎧','🧹','💊','🌱','🎯','☕','🚭','💻'];
+const COLORS=['#6c5ce7','#ec4899','#f97316','#eab308','#22c55e','#06b6d4','#3b82f6','#a855f7'];
+const REP={day:'Harian',week:'Mingguan',month:'Bulanan',year:'Tahunan'};
+const MON=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+const DAYS=['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+const NAV={today:['Hari Ini','<path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>'],sum:['Ringkasan','<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>'],notes:['Catatan','<path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h7"/>'],me:['Saya','<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>']};
+const K=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const P=s=>{const[a,b,c]=s.split('-').map(Number);return new Date(a,b-1,c)};
+const now=()=>{const d=new Date();d.setHours(0,0,0,0);return d};
+const addD=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let S;
+
+function seed(){const t=now(),log=p=>{const o={};for(let i=1;i<=40;i++)if(Math.random()<p)o[K(addD(t,-i))]='done';return o};
+  const wk={};for(let i=1;i<=40;i++){const x=addD(t,-i);if(x.getDay()===t.getDay()&&i%14)wk[K(x)]='done'}
+  return{cats:['Kesehatan','Produktif'],user:null,habits:[
+    {id:1,name:'Minum air 2 liter',icon:'💧',color:'#06b6d4',repeat:'day',cat:'Kesehatan',start:K(addD(t,-40)),log:log(.8)},
+    {id:2,name:'Baca buku 20 menit',icon:'📖',color:'#6c5ce7',repeat:'day',cat:'Produktif',start:K(addD(t,-40)),log:log(.6)},
+    {id:3,name:'Olahraga',icon:'🏃',color:'#f97316',repeat:'week',cat:'Kesehatan',start:K(addD(t,-40)),log:wk}]}}
+function load(){try{const r=localStorage.getItem('habitly_v1');const o=r?JSON.parse(r):null;return o&&typeof o==='object'&&!Array.isArray(o)?o:null}catch(e){return null}}
+/* BUG-C: normalisasi di memori (data lama / hasil import); bentuk skema tetap sama */
+const isObj=o=>!!o&&typeof o==='object'&&!Array.isArray(o);
+const vDate=x=>typeof x==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(x)&&K(P(x))===x?x:null;
+function normalize(st){
+  st.version=3;
+  st.cats=[...new Set((Array.isArray(st.cats)?st.cats:[]).filter(c=>typeof c==='string').map(c=>c.trim()).filter(Boolean))];
+  const seen=new Set();let mx=0;
+  st.habits=(Array.isArray(st.habits)?st.habits:[]).filter(isObj);
+  st.habits.forEach(h=>{const n=Number(h.id);if(Number.isFinite(n))mx=Math.max(mx,n)});
+  st.habits.forEach((h,i)=>{
+    let id=Number(h.id);if(!Number.isFinite(id)||seen.has(id))id=Math.max(mx,Date.now())+i+1;seen.add(id);h.id=id;
+    h.name=typeof h.name==='string'?h.name:String(h.name==null?'':h.name);
+    h.icon=typeof h.icon==='string'&&h.icon&&h.icon.length<=16&&!/[<>&"']/.test(h.icon)?h.icon:ICONS[0];
+    h.color=typeof h.color==='string'&&/^#[0-9a-fA-F]{6}$/.test(h.color)?h.color:COLORS[0];
+    h.repeat=['day','week','month','year'].includes(h.repeat)?h.repeat:'day';
+    const dd=Array.isArray(h.days)?[...new Set(h.days.map(Number).filter(x=>Number.isInteger(x)&&x>=0&&x<=6))]:[];
+    h.days=dd.length?dd:[0,1,2,3,4,5,6];
+    h.log=isObj(h.log)?h.log:{};h.notes=isObj(h.notes)?h.notes:{};h.times=isObj(h.times)?h.times:{};
+    ['mini','stack','cat'].forEach(f=>{h[f]=typeof h[f]==='string'?h[f]:''});
+    h.start=vDate(h.start)||Object.keys(h.log).filter(vDate).sort()[0]||K(now())});
+  st.notes=(Array.isArray(st.notes)?st.notes:[]).filter(isObj);
+  st.notes.forEach((n,i)=>{const id=Number(n.id);n.id=Number.isFinite(id)?id:Date.now()+i;
+    n.title=typeof n.title==='string'?n.title:'';n.body=typeof n.body==='string'?n.body:'';n.date=vDate(n.date)||K(now())});
+  const fz={};if(isObj(st.freezes))Object.keys(st.freezes).forEach(k=>{const v=st.freezes[k];
+    if(!v||!vDate(k))return;fz[k]=isObj(v)?{...v,reason:typeof v.reason==='string'?v.reason:''}:{reason:''}});
+  st.freezes=fz;
+  const rv={};if(isObj(st.reviews))Object.keys(st.reviews).forEach(k=>{if(typeof st.reviews[k]==='string')rv[k]=st.reviews[k]});
+  st.reviews=rv;
+  const u=st.user;st.user=isObj(u)&&typeof u.name==='string'&&u.name.trim()?{name:u.name,email:typeof u.email==='string'?u.email:''}:null;
+  return st}
+function save(){try{localStorage.setItem('habitly_v1',JSON.stringify(dump()))}catch(e){}pushSnapshot()}
+S=Object.assign({notes:[],freezes:{},reviews:{}},load()||seed(),{tab:'today',cat:'Semua',sel:K(now()),sheet:null,form:null,nf:null,mo:0,ex:{},cdc:null,qid:null,impConfirm:false,wrConfirm:false});
+normalize(S);save();
+
+/* BUG-H: draft catatan di sessionStorage */
+const DK='habitly_nf_draft';let _dt=null;
+function draftSave(){clearTimeout(_dt);_dt=setTimeout(()=>{try{if(S.nf)sessionStorage.setItem(DK,JSON.stringify(S.nf))}catch(e){}},300)}
+function draftClear(){clearTimeout(_dt);try{sessionStorage.removeItem(DK)}catch(e){}}
+function draftRestore(){if(S.nf)return false;try{const r=sessionStorage.getItem(DK);if(!r)return false;const d=JSON.parse(r);
+  if(!isObj(d)||typeof d.title!=='string'||typeof d.body!=='string'||(!d.title.trim()&&!d.body.trim()))return false;
+  const f={title:d.title,body:d.body};if(Number.isFinite(d.id))f.id=d.id;if(vDate(d.date))f.date=d.date;
+  if(Number.isFinite(d.views))f.views=d.views;if(Number.isFinite(d.hid))f.hid=d.hid;S.nf=f;return true}catch(e){return false}}
+/* konfirmasi 2-tap dengan timeout 3 dtk (BUG-B, BUG-J) */
+const _ct={};
+function arm(f){S[f]=true;clearTimeout(_ct[f]);_ct[f]=setTimeout(()=>{S[f]=false;
+  if(f==='impConfirm'){const x=document.querySelector('[data-a="imp"]');if(x)x.textContent='Pulihkan'}},3000)}
+function disarm(f){S[f]=false;clearTimeout(_ct[f])}
+
+/* ===== FITUR 1: widget bridge, check-in cepat, pintasan, PWA ===== */
+const HOSTED=/^https?:$/.test(location.protocol);
+const BASE=()=>location.href.split(/[?#]/)[0];
+const linkFor=(a,id)=>BASE()+'?a='+a+(id!=null?'&h='+id:'');
+const CHK_MSG={ok:'✓ Tercatat, streak aman!',already:'Sudah selesai ✓',off:'Hari ini libur',na:'Tidak terjadwal hari ini',nomini:'Belum ada versi mini'};
+function checkinToday(h,mode){const t=now(),tk=K(t);if(!sched(h,t))return'na';const v=val(h,tk);if(v==='off')return'off';
+  if(isDone(v))return'already';if(mode==='mini'&&!h.mini)return'nomini';h.log[tk]=mode==='mini'?'mini':'done';stamp(h,tk);return'ok'}
+function snapshot(includeStreak=false){const t=now(),tk=K(t),hs=S.habits.filter(h=>sched(h,t)).map(h=>{const v=val(h,tk);
+    return{id:h.id,name:h.name,icon:h.icon,color:h.color,status:v==='done'||v==='mini'||v==='off'?v:'pending',streak:includeStreak?stats(h).streak:null,canMini:!!h.mini}}),
+    act=hs.filter(x=>x.status!=='off'),dn=act.filter(x=>x.status==='done'||x.status==='mini').length;
+  return{version:3,date:tk,done:dn,total:act.length,pct:act.length?Math.round(dn/act.length*100):0,habits:hs}}
+function pushSnapshot(){_push(false)}
+let _psf=null;
+function pushSnapshotFull(){clearTimeout(_psf);_psf=setTimeout(()=>_push(true),300)}
+function _push(full){try{const j=JSON.stringify(snapshot(full));localStorage.setItem('habitly_widget',j);
+  if(window.HabitlyAndroid&&window.HabitlyAndroid.onSnapshot)window.HabitlyAndroid.onSnapshot(j);
+  const w=window.webkit&&window.webkit.messageHandlers&&window.webkit.messageHandlers.habitly;if(w)w.postMessage({type:'snapshot',data:JSON.parse(j)})}catch(e){}}
+function bridgeCheck(id,mode){const h=S.habits.find(x=>x.id===Number(id)),r=h?checkinToday(h,mode==='mini'?'mini':'done'):'na';
+  if(r==='ok'){save();render();setTimeout(()=>nudge(h,K(now())),100)}return{result:r,snapshot:snapshot()}}
+window.HabitlyBridge={version:3,snapshot:()=>snapshot(false),snapshotFull:()=>snapshot(true),checkin:bridgeCheck};
+function handleLink(){let m=null;try{const q=new URLSearchParams(location.search),a=q.get('a');if(!a)return null;
+    const hid=q.get('h'),h=hid!=null?S.habits.find(x=>x.id===Number(hid)):null;
+    if(a==='quick'||((a==='checkin'||a==='mini')&&hid==null)){S.sheet='quick';S._link=1}
+    else if(a==='checkin'||a==='mini'){if(!h)m='Kebiasaan tidak ditemukan';else{const r=checkinToday(h,a==='mini'?'mini':'done');m=CHK_MSG[r];
+      if(r==='ok'){S.sel=K(now());S.tab='today';setTimeout(()=>nudge(h,K(now())),100)}}save()}
+  }catch(e){}
+  try{history.replaceState(null,'',location.pathname)}catch(e){}return m}
+async function copyText(t){try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(t);return true}}catch(e){}
+  try{const x=document.createElement('textarea');x.value=t;x.style.position='fixed';x.style.opacity='0';document.body.appendChild(x);x.select();const ok=document.execCommand('copy');x.remove();return ok}catch(e){return false}}
+let _ip=null;
+if(window.addEventListener)window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();_ip=e});
+function installApp(){if(_ip){_ip.prompt();_ip=null;return}toast('Menu browser › Tambah ke Layar Utama')}
+function iconPng(z){const c=document.createElement('canvas');c.width=c.height=z;const x=c.getContext('2d'),g=x.createLinearGradient(0,0,z,z);
+  g.addColorStop(0,'#6c5ce7');g.addColorStop(1,'#a78bfa');x.fillStyle=g;x.fillRect(0,0,z,z);x.strokeStyle='#fff';x.lineWidth=z*.1;x.lineCap='round';x.lineJoin='round';
+  x.beginPath();x.moveTo(z*.3,z*.52);x.lineTo(z*.44,z*.66);x.lineTo(z*.71,z*.35);x.stroke();return c.toDataURL('image/png')}
+let _swOk=false;
+function setupSW(){if(!HOSTED||!('serviceWorker' in navigator))return;
+  const SW_SRC=`const C='habitly-v3';
+self.addEventListener('install',e=>{self.skipWaiting()});
+self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
+self.addEventListener('fetch',e=>{const r=e.request;if(r.method!=='GET'||!/^https?:/.test(r.url))return;
+  const u=new URL(r.url),k=r.mode==='navigate'?u.origin+u.pathname:r;
+  e.respondWith(caches.open(C).then(c=>c.match(k).then(hit=>{
+    const net=fetch(r).then(res=>{if(res&&res.ok&&res.type==='basic')c.put(k,res.clone());return res});
+    if(hit){e.waitUntil(net.catch(()=>{}));return hit}
+    return net})))});`;
+  SW_SRC_CACHE=SW_SRC;
+  const ok=()=>{_swOk=true},ext=()=>fetch('sw.js',{method:'HEAD',cache:'no-store'}).then(r=>{
+    if(r.ok&&/javascript/.test(r.headers.get('content-type')||''))return navigator.serviceWorker.register('sw.js').then(ok)}).catch(()=>{});
+  try{navigator.serviceWorker.register(URL.createObjectURL(new Blob([SW_SRC],{type:'text/javascript'}))).then(ok).catch(ext)}catch(e){ext()}}
+let SW_SRC_CACHE='';
+function downloadSW(){try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([SW_SRC_CACHE],{type:'text/javascript'}));a.download='sw.js';document.body.appendChild(a);a.click();a.remove();toast('sw.js diunduh ✓')}catch(e){toast('Gagal mengunduh sw.js')}}
+function setupPwa(){try{const add=(rel,href)=>{const l=document.createElement('link');l.rel=rel;l.href=href;document.head.appendChild(l)};
+    add('apple-touch-icon',iconPng(180));if(!HOSTED)return;
+    const base=BASE(),i1=iconPng(192),i2=iconPng(512);
+    const m={name:'Habitly',short_name:'Habitly',description:'Habit tracker yang tidak bikin kamu merasa gagal.',lang:'id',
+      start_url:base+'?src=pwa',scope:base.replace(/[^/]*$/,''),display:'standalone',background_color:'#f5f4fb',theme_color:'#6c5ce7',
+      icons:[{src:i1,sizes:'192x192',type:'image/png',purpose:'any'},{src:i2,sizes:'512x512',type:'image/png',purpose:'any'},{src:i2,sizes:'512x512',type:'image/png',purpose:'maskable'}],
+      shortcuts:[{name:'Check-in cepat',short_name:'Check-in',url:base+'?a=quick&src=shortcut'}]};
+    add('manifest',URL.createObjectURL(new Blob([JSON.stringify(m)],{type:'application/manifest+json'})))}catch(e){}}
+function quickSheet(){const t=now(),tk=K(t),l=S.habits.filter(h=>sched(h,t)&&val(h,tk)!=='off'&&!isDone(h.log[tk]));
+  return`<div class='sheetbg' data-a='close'><div class='sheet' role='dialog' aria-label='Check-in cepat'><div class='bar'></div><div class='name' style='font-size:18px'>⚡ Check-in cepat</div><div class='mut'>${fmtDate(tk)} · ketuk untuk menandai selesai</div>
+  ${l.length?l.map(h=>`<div class='row' style='gap:8px'><button class='btn grow' style='text-align:left;padding:16px' data-a='qc' data-v='${h.id}' aria-label='Selesai: ${esc(h.name)}'>${esc(h.icon)} ${esc(h.name)}</button>${h.mini?`<button class='btn' style='width:auto;padding:16px' data-a='qcm' data-v='${h.id}' aria-label='Versi mini: ${esc(h.name)}'>⚡</button>`:''}</div>`).join(''):`<div class='nb'>🎉 Semua kebiasaan hari ini sudah beres.</div>`}
+  <button class='btn' data-a='close'>Tutup</button></div></div>`}
+function widgetCard(){const std=(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone;
+  return`<div class="card"><div class="name">📲 Layar utama & pintasan</div><div class="mut" style="margin:4px 0 12px">Pasang Habitly, lalu centang kebiasaan dalam satu ketukan dari layar utama atau layar kunci.</div>
+  <button class="btn p" data-a="quick">⚡ Buka check-in cepat</button>
+  <button class="btn" style="margin-top:10px" data-a="pwa">${std?'Sudah terpasang ✓':'Pasang ke layar utama'}</button>
+  <div class="mut" style="margin-top:10px">iPhone: Safari › Bagikan › Tambah ke Layar Utama. Android: menu ⋮ › Instal aplikasi.</div>
+  ${HOSTED&&!_swOk?`<div class="mut" style="margin-top:8px">Agar tombol pasang & mode offline aktif di Chrome, simpan sw.js di folder yang sama dengan file ini lalu muat ulang.</div><button class="btn" style="margin-top:8px" data-a="swdl">Unduh sw.js</button>`:''}
+  ${HOSTED?'':`<div class="mut" style="margin-top:8px">⚠️ Tautan pintasan baru berfungsi jika file ini di-hosting lewat HTTPS.</div>`}
+  <div class="l" style="margin:18px 0 8px">Tautan pintasan</div>
+  <button class="btn" data-a="lnkq">Salin tautan check-in cepat</button>
+  ${S.habits.map(h=>`<div class="row" style="padding:8px 0;border-top:1px solid var(--line);margin-top:8px"><div class="grow name" style="font-size:14px">${esc(h.icon)} ${esc(h.name)}</div><button class="btn" style="width:auto;padding:8px 12px;font-size:12px" data-a="lnk" data-v="${h.id}" aria-label="Salin tautan ${esc(h.name)}">Salin</button></div>`).join('')}
+  <div class="mut" style="margin-top:10px">Tempel tautan ke app Pintasan iOS (aksi “Buka URL”) atau pintasan layar utama Android agar satu ketukan langsung mencentang kebiasaan itu.</div></div>`}
+
+function sched(h,d){const s=P(h.start);if(d<s)return false;
+  if(h.repeat==='day')return !h.days||!h.days.length||h.days.includes(d.getDay());
+  if(h.repeat==='week')return d.getDay()===s.getDay();
+  if(h.repeat==='month')return d.getDate()===s.getDate();
+  return d.getDate()===s.getDate()&&d.getMonth()===s.getMonth()}
+
+/* BUG-001: streak tidak putus oleh hari ini yang belum dicentang & hari libur */
+function stats(h){const t=now(),tk=K(t),s=P(h.start);let streak=0,run=true,elig=0,done=0;
+  for(let d=new Date(t);d>=s;d=addD(d,-1)){
+    if(!sched(h,d))continue;const k=K(d),v=val(h,k);
+    if(v==='off')continue;                       // libur: dilewati, tidak memutus & tidak dihitung
+    if(isDone(v)){done++;elig++;if(run)streak++;continue}
+    if(k===tk)continue;                          // hari ini belum selesai: belum dianggap gagal
+    elig++;run=false}                            // hari terjadwal terlewat: streak putus
+  let ms=0,md=0;
+  for(let d=new Date(t.getFullYear(),t.getMonth(),1);d<=t;d=addD(d,1)){
+    if(!sched(h,d))continue;const k=K(d),v=val(h,k);
+    if(v==='off'||(!v&&k===tk))continue;ms++;if(isDone(v))md++}
+  return{streak,streakPct:elig?Math.round(streak/elig*100):0,cr:elig?Math.round(done/elig*100):0,fin:ms?Math.round(md/ms*100):0}}
+
+function dump(){return{version:3,cats:S.cats,habits:S.habits,user:S.user,notes:S.notes,freezes:S.freezes,reviews:S.reviews}}
+function isDone(v){return v==='done'||v==='mini'}
+function val(h,k){const v=h.log[k];return v||(S.freezes[k]?'off':v)}
+function fmtDate(k){const d=P(k);return d.getDate()+' '+MON[d.getMonth()].slice(0,3)+' '+d.getFullYear()}
+function wkStats(a,b){const t=now();let tot=0,dn=0;const per=[];
+  S.habits.forEach(h=>{let n=0,c=0;
+    for(let i=a;i<=b;i++){const d=addD(t,-i);if(!sched(h,d))continue;const v=val(h,K(d));if(v==='off'||(!v&&i===0))continue;n++;if(isDone(v))c++}
+    tot+=n;dn+=c;if(n)per.push({h,p:Math.round(c/n*100)})});
+  return{tot,dn,per,pct:tot?Math.round(dn/tot*100):0}}
+function freezeLeft(){const m=S.sel.slice(0,7),used=Object.keys(S.freezes).filter(k=>k.startsWith(m)).length;
+  return Math.max(0,3-used)}
+function nudge(h,k){k=k||S.sel;const nx=S.habits.find(x=>x.stack&&x.stack.toLowerCase()===h.name.toLowerCase()&&!isDone(x.log[k])&&sched(x,P(k)));
+  if(nx)setTimeout(()=>toast('🔗 Selanjutnya: '+nx.name),1900)}
+function repLabel(h){if(h.repeat!=='day'||!h.days||h.days.length>=7)return REP[h.repeat];
+  const o=[1,2,3,4,5,6,0].filter(d=>h.days.includes(d)),k=o.join();
+  return k==='1,2,3,4,5'?'Hari kerja':k==='6,0'?'Akhir pekan':o.map(d=>DAYS[d].slice(0,3)).join(', ')}
+function dayPicker(f){const sel=f.days||[0,1,2,3,4,5,6];
+  return`<div class='mut' style='margin:14px 0 8px'>Pilih hari pelaksanaan</div><div class='grid' style='gap:6px;flex-wrap:nowrap'>${[1,2,3,4,5,6,0].map(d=>`<button class='chip ${sel.includes(d)?'on':''}' style='flex:1;padding:11px 0;text-align:center' data-a='fd' data-v='${d}'>${DAYS[d].slice(0,3)}</button>`).join('')}</div>`}
+function stamp(h,k){if(k!==K(now()))return;(h.times=h.times||{})[k]=new Date().getHours()}
+function wkKey(){const t=now();return K(addD(t,-((t.getDay()+6)%7)))}
+function noteCount(){const t=now(),from=addD(t,-6);let total=0,best={h:null,n:0};
+  S.habits.forEach(h=>{const n=Object.keys(h.notes||{}).filter(k=>P(k)>=from&&P(k)<=t).length;total+=n;if(n>best.n)best={h,n}});
+  return{...best,total}}
+function hsh(o){let x=0;for(const k in o){const q=k+o[k];for(let i=0;i<q.length;i++)x=(x*31+q.charCodeAt(i))|0}return x}
+function insightKey(){const fk=Object.keys(S.freezes);
+  return JSON.stringify([S.habits.map(h=>h.id+':'+Object.keys(h.log).length),fk.length,K(now()),
+    S.habits.map(h=>[hsh(h.log),hsh(h.times),h.repeat,h.days.join(''),h.start]),fk.sort().join()])}
+function insights(){const ck=insightKey();if(S._insightCache&&S._insightCache.key===ck)return S._insightCache.value;
+  const v=insightsCalc();S._insightCache={key:ck,value:v};return v}
+function insightsCalc(){const t=now(),out=[];
+  S.habits.forEach(a=>S.habits.forEach(b=>{if(a.id>=b.id)return;let ad=0,an=0,bd=0,bn=0;
+    for(let i=0;i<28;i++){const d=addD(t,-i),k=K(d);if(!sched(a,d)||!sched(b,d))continue;const va=val(a,k),vb=val(b,k);
+      if(va==='off'||vb==='off'||(i===0&&!va))continue;
+      if(isDone(va)){ad++;if(isDone(vb))bd++}else{an++;if(isDone(vb))bn++}}
+    if(ad<5||an<5)return;const p1=Math.round(bd/ad*100),p0=Math.round(bn/an*100);
+    if(p1-p0>=15)out.push({gap:p1-p0,text:`🔍 Pola menarik: dalam 28 hari terakhir, saat kamu menyelesaikan “${a.name}”, “${b.name}” ikut selesai ${p1}% (vs ${p0}% di hari lain), selisih ${p1-p0} poin. Pertahankan!`})}));
+  patterns(out);
+  return out.sort((x,y)=>y.gap-x.gap).slice(0,3)}
+function patterns(out){const t=now(),wd=Array.from({length:7},()=>({n:0,c:0})),day=[];
+  for(let i=0;i<56;i++){const d=addD(t,-i),k=K(d);let n=0,c=0,am=false,pm=false;
+    S.habits.forEach(h=>{if(!sched(h,d))return;const v=val(h,k);if(v==='off'||(!v&&i===0))return;n++;
+      if(isDone(v)){c++;const hr=h.times&&h.times[k];if(hr!=null){if(hr<12)am=true;else pm=true}}});
+    if(!n)continue;wd[d.getDay()].n+=n;wd[d.getDay()].c+=c;if(am||pm)day.push({r:c/n,am})}
+  const tn=wd.reduce((a,x)=>a+x.n,0),avg=tn?Math.round(wd.reduce((a,x)=>a+x.c,0)/tn*100):0;
+  const rk=wd.map((x,i)=>({i,n:x.n,p:x.n?Math.round(x.c/x.n*100):0})).filter(x=>x.n>=6).sort((a,b)=>b.p-a.p);
+  if(rk.length>1){const hi=rk[0],lo=rk[rk.length-1];
+    if(hi.p-avg>=10)out.push({gap:hi.p-avg,text:`🔍 Pola: Konsistensi kamu paling tinggi di hari ${DAYS[hi.i]} (${hi.p}%, ${hi.p-avg} poin di atas rata-rata). Manfaatkan hari itu untuk kebiasaan yang paling sulit!`});
+    if(avg-lo.p>=15)out.push({gap:avg-lo.p,text:`🔍 Pola: Hari ${DAYS[lo.i]} paling sering terlewat (${lo.p}%). Coba siapkan versi mini untuk hari itu.`})}
+  const A=day.filter(x=>x.am),B=day.filter(x=>!x.am);
+  if(A.length>=4&&B.length>=4){const m=a=>a.reduce((q,x)=>q+x.r,0)/a.length,df=Math.round((m(A)-m(B))*100);
+    if(df>=10)out.push({gap:df,text:`🔍 Pola: Konsistensi kamu meningkat ${df}% pada hari saat kamu menyelesaikan kebiasaan di pagi hari!`})}}
+function weekCard(){const w=wkStats(0,6),t=now(),nc=noteCount(),wk=wkKey();
+  const ss=S.habits.map(h=>stats(h).streak),act=ss.filter(x=>x>0).length,sum=ss.reduce((a,b)=>a+b,0);
+  return`<div class='card'><div class='name'>📅 Review Mingguan</div><div class='mut'>${fmtDate(K(addD(t,-6)))} – ${fmtDate(K(t))}</div>
+  <div class='stats' style='margin-top:12px'><div class='st'><b style='color:var(--ok)'>${w.pct}%</b><span>Kebiasaan selesai<br>${w.dn} dari ${w.tot}</span></div><div class='st'><b style='color:var(--acc)'>${act}</b><span>Streak aktif<br>total ${sum} hari</span></div><div class='st'><b style='color:#f97316'>${nc.total}</b><span>Catatan<br>minggu ini</span></div></div>
+  <div class='mut' style='margin:12px 0 0'>${nc.h?'📝 Paling sering dicatat: '+esc(nc.h.name)+' ('+nc.n+'x)':'📝 Belum ada catatan minggu ini. Tulis refleksi singkat pada kebiasaan yang selesai.'}</div>
+  <div class='row' style='justify-content:space-between;margin:16px 0 8px'><label class='l' for='wrtext' style='margin:0'>Refleksi minggu ini</label><button class='btn' style='width:auto;padding:7px 12px;font-size:12px' data-a='wr-fill'>Isi draft</button></div>
+  <textarea id='wrtext' data-wk='${wk}' rows='4' placeholder='Apa yang berjalan baik? Apa yang bisa diperbaiki?'>${esc(S.reviews[wk]||'')}</textarea>
+  <button class='btn' style='margin-top:10px' data-a='wr'>Simpan ke Notes</button></div>`}
+function catCard(){
+  return`<div class='card'><div class='name'>🏷️ Kategori</div><div class='mut' style='margin:4px 0 8px'>Tambah atau hapus kategori kebiasaan.</div>
+  ${S.cats.length?S.cats.map(c=>{const n=S.habits.filter(h=>h.cat===c).length,ask=S.cdc===c;
+    return`<div class='row' style='padding:10px 0;border-top:1px solid var(--line)'><div class='grow'><div class='name' style='font-size:14px'>${esc(c)}</div><div class='mut'>${n?n+' kebiasaan':'Tidak dipakai'}${ask?' · akan dipindah ke Tanpa kategori':''}</div></div><button class='btn danger' style='width:auto;padding:9px 14px' data-a='catdel' data-v='${esc(c)}'>${ask?'Yakin?':'Hapus'}</button></div>`}).join(''):`<div class='mut'>Belum ada kategori.</div>`}
+  <div class='row' style='margin-top:12px;gap:8px'><input type='text' id='catnew' placeholder='Kategori baru' maxlength='24'><button class='btn p' style='width:auto;padding:14px 18px' data-a='catadd'>Tambah</button></div></div>`}
+function qnSheet(){const h=S.habits.find(x=>x.id===S.qid);if(!h)return'';
+  return`<div class='sheetbg' data-a='close'><div class='sheet'><div class='bar'></div>
+  <div class='row'><div class='ico' style='background:${h.color}26'>${h.icon}</div><div><div class='name'>${esc(h.name)}</div><div class='mut'>Catatan · ${fmtDate(S.sel)}</div></div></div>
+  <textarea id='qntext' rows='4' maxlength='300' placeholder='mis. Bahu kiri agak pegal saat workout'>${esc((h.notes&&h.notes[S.sel])||'')}</textarea>
+  <button class='btn p' data-a='qnsave'>Simpan catatan</button></div></div>`}
+function insCard(){const l=insights();
+  return`<div class='card ins'><div class='name'>💡 Insight Engine</div>${l.length?l.map(i=>`<div style='margin-top:10px;font-size:13.5px;line-height:1.5'>${esc(i.text)}</div>`).join(''):`<div class='mut' style='margin-top:8px'>Belum ada pola yang jelas. Catat kebiasaanmu beberapa minggu lagi dan insight akan muncul di sini.</div>`}</div>`}
+function habitBlock(h){const s=stats(h),t=now(),v=val(h,S.sel);
+  const days=[6,5,4,3,2,1,0].map(i=>{const d=addD(t,-i);if(!sched(h,d))return'·';const x=val(h,K(d));return x==='done'?'✓':x==='mini'?'½':x==='off'?'❄':(i===0?'…':'✕')}).join(' ');
+  return`🔖 Data habit\n• Kebiasaan: ${h.name} (${repLabel(h)}${h.cat?' · '+h.cat:''})\n• Status ${fmtDate(S.sel)}: ${v==='done'?'Selesai':v==='mini'?'Versi mini':v==='off'?'Libur':'Belum'}\n• Streak: ${s.streak} · Completion rate: ${s.cr}%\n• 7 hari terakhir: ${days}`}
+const WRH='📅 Review Mingguan';
+function weeklyDraft(fresh){const rv=fresh?'':(S.reviews[wkKey()]||'');if(rv.startsWith(WRH))return rv;const w=wkStats(0,6),t=now(),from=addD(t,-6);
+  const mini=S.habits.reduce((n,h)=>n+Object.entries(h.log).filter(([k,v])=>v==='mini'&&P(k)>=from).length,0);
+  const fz=Object.keys(S.freezes).filter(k=>P(k)>=from&&P(k)<=t).length;
+  const best=[...w.per].sort((a,b)=>b.p-a.p)[0],low=[...w.per].sort((a,b)=>a.p-b.p)[0];
+  const top=[...S.notes].sort((a,b)=>(b.views||0)-(a.views||0))[0],ins=insights()[0],nc=noteCount();
+  return`${WRH} · ${fmtDate(K(from))} – ${fmtDate(K(t))}\n\n`
+   +`• Minggu ini kamu menyelesaikan ${w.pct}% habit (${w.dn} dari ${w.tot}).\n`
+   +(best?`• Paling konsisten: ${best.h.name} (${best.p}%).\n`:'')
+   +(low&&low!==best?`• Perlu perhatian: ${low.h.name} (${low.p}%).\n`:'')
+   +(mini?`• ${mini}x memakai versi mini, streak tetap aman ⚡\n`:'')
+   +(fz?`• ${fz} hari Life Happens ❄️\n`:'')
+   +(top&&top.views?`• Catatan paling sering dibuka: [[${top.title}]]\n`:'')
+   +(nc.h?`• Paling sering dicatat: ${nc.h.name} (${nc.n} catatan)\n`:'')
+   +(ins?`• ${ins.text}\n`:'')
+   +`\n— Refleksi —\n`+(rv||'Apa yang berjalan baik?\n\nApa yang bisa diperbaiki?\n')}
+function lifeSheet(){const fz=S.freezes[S.sel];
+  return`<div class='sheetbg' data-a='close'><div class='sheet'><div class='bar'></div><div class='name' style='font-size:18px'>💙 Life Happens</div>
+  <div class='mut'>${fz?'Hari ini dibekukan. Streak kamu aman.'+(fz.reason?' Alasan: '+esc(fz.reason):''):'Sakit atau ada urusan darurat? Bekukan hari ini tanpa merusak streak.'}</div>
+  <div class='nb'>❄️ Sisa freeze bulan ini: ${freezeLeft()}\nKuota tetap 3 kali per bulan kalender</div>
+  ${fz?'':`<input type='text' id='lreason' placeholder='Alasan (opsional)' maxlength='60'>`}
+  <button class='btn p' data-a='freeze'>${fz?'Batalkan freeze':'Bekukan hari ini'}</button></div></div>`}
+function notesV(){
+  return`<div class='hdr'><div><h1>Catatan</h1><div class='mut'>Refleksi & catatan kebiasaan</div></div></div>
+  <button class='card row ins' data-a='wr' style='width:100%;text-align:left'><div class='ico' style='background:#ffffff30'>📝</div><div class='grow'><div class='name'>Review Mingguan${now().getDay()===0?' · Hari ini!':''}</div><div class='mut'>Draft otomatis dari data 7 harimu. Tinggal tambah refleksi.</div></div></button>
+  <button class='add' data-a='nnew' style='margin:2px 0 18px'>＋ Catatan baru</button>
+  ${S.notes.length?S.notes.map(n=>`<button class='card' data-a='nopen' data-v='${n.id}' style='display:block;width:100%;text-align:left'><div class='name'>${esc(n.title)}</div><div class='mut' style='margin:4px 0 8px'>${fmtDate(n.date)}${n.views?' · dibuka '+n.views+'x':''}</div><div class='mut' style='display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden'>${esc(n.body.replace(/\s+/g,' ').slice(0,140))}</div></button>`).join(''):`<div class='empty'><big>📝</big>Belum ada catatan.</div>`}`}
+function noteFormV(){const f=S.nf;
+  return`<div class='hdr'><button class='back' data-a='ncancel' aria-label='Kembali'>←</button><div class='name'>${f.id?'Edit Catatan':'Catatan Baru'}</div><span style='width:42px'></span></div>
+  <input type='text' id='ntitle' placeholder='Judul' value="${esc(f.title)}" maxlength='80'>
+  <textarea id='nbody' class='big' placeholder='Tulis refleksimu…' style='margin-top:12px'>${esc(f.body)}</textarea>
+  <button class='add' style='margin-top:18px;background:var(--acc);color:#fff' data-a='nsave'>Simpan</button>
+  ${f.id?`<button class='btn danger' style='margin-top:10px' data-a='ndel' data-v='${f.id}'>${S.cd===f.id?'⚠️ Tap lagi untuk menghapus':'Hapus catatan'}</button>`:''}`}
+function toast(m){const e=document.createElement('div');e.className='toast';e.textContent=m;$('#app').appendChild(e);setTimeout(()=>e.remove(),1800)}
+
+function render(){if(S.sheet==='qn'&&!S.habits.some(x=>x.id===S.qid)){S.sheet=null;S.qid=null}
+  const mn=$('#main'),y=mn.scrollTop;
+  $('#nav').style.display=S.form||S.nf?'none':'flex';
+  $('#nav').innerHTML=Object.entries(NAV).map(([k,[l,i]])=>`<button class="${S.tab===k?'on':''}" data-a="tab" data-v="${k}" ${S.tab===k?'aria-current="page"':''}><svg viewBox="0 0 24 24">${i}</svg>${l}</button>`).join('');
+  mn.innerHTML=S.form?formV():S.nf?noteFormV():S.tab==='today'?todayV():S.tab==='sum'?sumV():S.tab==='notes'?notesV():meV();
+  mn.scrollTop=y;
+  const h=S.sheet&&S.habits.find(x=>x.id===S.sheet),v=h&&h.log[S.sel];
+  $('#ov').innerHTML=S.sheet==='life'?lifeSheet():S.sheet==='qn'?qnSheet():S.sheet==='quick'?quickSheet():h?`<div class="sheetbg" data-a="close"><div class="sheet"><div class="bar"></div>
+   <div class="row" style="margin-bottom:6px"><div class="ico" style="background:${h.color}26">${h.icon}</div><div class="name">${esc(h.name)}</div></div>
+   <button class="btn" data-a="off" data-v="${h.id}">🌴 ${v==='off'?'Batalkan libur':'Libur Hari Ini'}</button>
+   ${h.mini&&!isDone(v)?`<button class="btn" data-a="mini" data-v="${h.id}">⚡ Versi mini: ${esc(h.mini)}</button>`:''}<button class="btn" data-a="hnote" data-v="${h.id}">📝 Tambah Catatan</button><button class="btn" data-a="edit" data-v="${h.id}">✏️ Edit kebiasaan</button>
+   <button class="btn danger" data-a="del" data-v="${h.id}">${S.cd===h.id?'⚠️ Tap lagi untuk menghapus':'🗑️ Hapus'}</button></div></div>`:''}
+
+function todayV(){const t=now(),sd=P(S.sel),list=S.habits.filter(h=>sched(h,sd)&&(S.cat==='Semua'||h.cat===S.cat));
+  const fr=S.freezes[S.sel],act=list.filter(h=>val(h,S.sel)!=='off'),dn=act.filter(h=>isDone(h.log[S.sel])).length,pct=act.length?Math.round(dn/act.length*100):0,R=34,C=2*Math.PI*R;
+  const hr=new Date().getHours(),gr=hr<11?'Selamat pagi':hr<15?'Selamat siang':hr<19?'Selamat sore':'Selamat malam';
+  return`<div class="mut">${gr}${S.user?', '+esc(S.user.name):''} 👋</div><h1>${S.sel===K(t)?'Hari ini':DAYS[sd.getDay()]}</h1>
+  <div class="hero"><div><div class="mut">${sd.getDate()} ${MON[sd.getMonth()]} ${sd.getFullYear()}</div><b>${dn} dari ${act.length} selesai</b><div class="mut">${pct===100&&act.length?'Hebat, semua beres! 🎉':'Terus semangat!'}</div><button class="pill" data-a="life">${fr?'❄️ Hari dibekukan':'💙 Life Happens'} · sisa ${freezeLeft()}</button></div>
+   <div style="position:relative;width:86px;height:86px"><svg width="86" height="86" viewBox="0 0 86 86" style="transform:rotate(-90deg)"><circle cx="43" cy="43" r="${R}" fill="none" stroke="#ffffff40" stroke-width="9"/><circle cx="43" cy="43" r="${R}" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-pct/100)}" style="transition:stroke-dashoffset .5s"/></svg><div style="position:absolute;inset:0;display:grid;place-items:center;font-weight:800;font-size:18px">${pct}%</div></div></div>
+  <div class="week">${[6,5,4,3,2,1,0].map(i=>{const d=addD(t,-i);return`<button class="wd ${K(d)===S.sel?'on':''}" data-a="sel" data-v="${K(d)}">${DAYS[d.getDay()].slice(0,3)}<b>${d.getDate()}</b></button>`}).join('')}</div>
+  <div class="chips">${['Semua',...S.cats].map(c=>`<button class="chip ${S.cat===c?'on':''}" data-a="cat" data-v="${esc(c)}">${esc(c)}</button>`).join('')}</div>
+  ${list.length?list.map(h=>{const v=val(h,S.sel),dn1=isDone(v),anc=h.stack&&S.habits.find(x=>x.name.toLowerCase()===h.stack.toLowerCase()),turn=anc&&isDone(anc.log[S.sel])&&!dn1;
+   return`<div class="card row" style="${dn1?`background:${h.color}1c;`:''}${v==='off'?'opacity:.6':''}"><div class="ico" style="background:${h.color}26">${h.icon}</div>
+   <div class="grow"><div class="name" style="${dn1?'opacity:.6;text-decoration:line-through':''}">${esc(h.name)}</div><div class="mut">${esc(h.cat||'Tanpa kategori')} · ${repLabel(h)}${v==='off'?' · Libur':''}${v==='mini'?' · Versi mini':''}</div>${h.stack?`<div class="tag">🔗 Setelah ${esc(h.stack)}${turn?' · 🔔 Giliranmu!':''}</div>`:''}${!dn1&&v!=='off'&&h.mini?`<button class="mb" data-a="mini" data-v="${h.id}">⚡ Hari sibuk? ${esc(h.mini)}</button>`:''}${dn1?`<button class="mb ${h.notes&&h.notes[S.sel]?'nt':''}" data-a="qn" data-v="${h.id}">${h.notes&&h.notes[S.sel]?'📝 '+esc(h.notes[S.sel].slice(0,70)):'📝 Tulis catatan / refleksi'}</button>`:''}</div>
+   <button class="chk" data-a="tog" data-v="${h.id}" aria-pressed="${dn1}" aria-label="Selesai: ${esc(h.name)}" style="border-color:${h.color};background:${dn1?h.color:'transparent'};${v==='mini'?'opacity:.6':''}">${v==='done'?'✓':v==='mini'?'½':''}</button>
+   <button class="dots" data-a="menu" data-v="${h.id}" aria-label="Menu kebiasaan ${esc(h.name)}">⋯</button></div>`}).join('')
+   :`<div class="empty"><big>🌱</big>Belum ada kebiasaan untuk hari ini.</div>`}
+  <button class="add" data-a="new">＋ Tambah Kebiasaan</button>`}
+
+function formV(){const f=S.form;
+  return`<div class="hdr"><button class="back" data-a="cancel" aria-label="Kembali">←</button><div class="name">${f.id?'Edit Kebiasaan':'Kebiasaan Baru'}</div><span style="width:42px"></span></div>
+  <div class="card row" style="background:${f.color}1c"><div class="ico" style="background:${f.color};color:#fff">${f.icon}</div><div class="name" id="pvn">${esc(f.name)||'Nama kebiasaan'}</div></div>
+  <label class="l" style="margin-top:8px">Nama kebiasaan</label><input type="text" id="fname" placeholder="mis. Meditasi pagi" value="${esc(f.name)}" maxlength="40">
+  <label class="l">Ikon</label><div class="grid">${ICONS.map(i=>`<button class="g ${f.icon===i?'on':''}" data-a="fi" data-v="${i}">${i}</button>`).join('')}</div>
+  <label class="l">Warna</label><div class="grid">${COLORS.map(c=>`<button class="sw ${f.color===c?'on':''}" style="background:${c}" data-a="fc" data-v="${c}"></button>`).join('')}</div>
+  <label class="l">Ulangi</label><div class="seg">${Object.entries(REP).map(([k,v])=>`<button class="${f.repeat===k?'on':''}" data-a="fr" data-v="${k}">${v}</button>`).join('')}</div>
+  ${f.repeat==='day'?dayPicker(f):''}<label class="l">Versi mini (opsional)</label><input type="text" id="fmini" placeholder="mis. Stretching 5 menit" value="${esc(f.mini||'')}" maxlength="40"><div class="mut" style="margin-top:8px">Dipakai saat hari sibuk agar streak tidak putus.</div>
+  <label class="l">Habit stacking (opsional)</label><div class="mut" style="margin:-4px 0 10px">Setelah saya…</div>
+  <div class="grid" style="margin-bottom:10px">${S.habits.filter(x=>x.id!==f.id).map(x=>`<button class="chip ${f.stack===x.name?'on':''}" data-a="fs" data-v="${esc(x.name)}">${esc(x.name)}</button>`).join('')}</div>
+  <input type="text" id="fstack" placeholder="…atau tulis sendiri, mis. Minum kopi pagi" value="${esc(f.stack||'')}" maxlength="40">
+  <label class="l">Kategori</label><div class="grid" style="margin-bottom:12px">${S.cats.map(c=>`<div class="chip ${f.cat===c&&!f.newCat?'on':''}" style="display:flex;align-items:center;gap:8px;padding-right:8px"><button data-a="fk" data-v="${esc(c)}">${esc(c)}</button><button data-a="catdel" data-v="${esc(c)}" aria-label="Hapus kategori ${esc(c)}" style="opacity:.75;font-size:12px;padding:4px">${S.cdc===c?'Yakin?':'✕'}</button></div>`).join('')}</div>
+  <input type="text" id="fnew" placeholder="…atau buat kategori baru" value="${esc(f.newCat||'')}" maxlength="24">
+  <button class="add" style="margin-top:28px;background:var(--acc);color:#fff" data-a="save">Simpan</button>`}
+
+function sumV(){
+  if(!S.habits.length)return`<h1>Ringkasan</h1><div class="empty"><big>📊</big>Belum ada kebiasaan.</div>`;
+  const t=now(),b=new Date(t.getFullYear(),t.getMonth()+S.mo,1),n=new Date(b.getFullYear(),b.getMonth()+1,0).getDate();
+  return`<div class="hdr"><div><h1>Ringkasan</h1><div class="mut">Semua kebiasaan · ${MON[b.getMonth()]} ${b.getFullYear()}</div></div><div class="row" style="gap:8px"><button class="back" data-a="mo" data-v="-1" aria-label="Bulan sebelumnya">‹</button><button class="back" data-a="mo" data-v="1" aria-label="Bulan berikutnya" ${S.mo>=0?'style="opacity:.35" aria-disabled="true"':''}>›</button></div></div>
+  ${insCard()}${weekCard()}${S.habits.map(h=>{const s=stats(h);let cells='';
+   for(let i=1;i<=n;i++){const d=new Date(b.getFullYear(),b.getMonth(),i),v=h.log[K(d)],fz=!v&&S.freezes[K(d)];let c;
+     if(v==='done')c='ok';else if(v==='mini')c='ok mini';else if(fz&&sched(h,d))c='fz';else if(v==='off'||!sched(h,d))c='off';else if(d<t)c='no';else if(K(d)===K(t))c='td';else c='nx';
+     if(K(d)===K(t)&&c!=='td')c+=' td';
+     cells+=`<div class="d ${c}">${v==='done'?'✓':v==='mini'?'½':c==='fz'?'❄':c==='no'?'✕':i}</div>`}
+   return`<div class="card"><div class="row" data-a="ex" data-v="${h.id}" style="cursor:pointer"><div class="ico" style="background:${h.color}26;width:44px;height:44px;font-size:21px;border-radius:15px">${h.icon}</div><div class="grow"><div class="name">${esc(h.name)}</div><div class="mut">${repLabel(h)} · ${esc(h.cat||'Tanpa kategori')}</div></div><div class="mut" style="font-size:18px">${S.ex[h.id]?'▾':'▸'}</div></div>
+   ${S.ex[h.id]?`<div class="cal">${DAYS.map(x=>`<i>${x[0]}</i>`).join('')}${'<span></span>'.repeat(b.getDay())}${cells}</div>`:''}
+   <div class="stats" style="margin-top:${S.ex[h.id]?0:14}px"><div class="st"><b style="color:var(--acc)">${s.streakPct}%</b><span>Streak Saat Ini<br>${s.streak} periode</span></div><div class="st"><b style="color:var(--ok)">${s.fin}%</b><span>Kebiasaan Selesai<br>bulan ini</span></div><div class="st"><b style="color:#f97316">${s.cr}%</b><span>Tingkat<br>Penyelesaian</span></div></div></div>`}).join('')}`}
+
+function meV(){const u=S.user;
+  return`<h1 style="margin-bottom:18px">Saya</h1>
+  <div class="card"><div class="row"><div class="ico" style="background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff;border-radius:50%;font-weight:800">${u?esc(u.name[0].toUpperCase()):'?'}</div>
+  <div class="grow"><div class="name">${u?esc(u.name):'Tamu'}</div><div class="mut">${u?esc(u.email):'Belum masuk'}</div></div></div>
+  ${u?`<button class="btn" style="margin-top:14px" data-a="logout">Keluar</button>`:`<div style="margin-top:16px;display:grid;gap:10px"><input type="text" id="lname" placeholder="Nama"><input type="email" id="lmail" placeholder="Email"><button class="btn p" data-a="login">Masuk</button><div class="mut">Demo: data login hanya disimpan di perangkat ini.</div></div>`}</div>
+  <div class="card"><div class="name">☁️ Cadangan</div><div class="mut" style="margin:4px 0 12px">Salin data untuk disimpan, atau tempel untuk memulihkan.</div>
+  <textarea id="bk" rows="4" style="font-size:12px;box-shadow:none;background:var(--chip)" placeholder="Data cadangan…"></textarea>
+  <div class="row" style="margin-top:12px;gap:10px"><button class="btn p" data-a="exp">Ekspor</button><button class="btn" data-a="imp">${S.impConfirm?'Yakin? Tap lagi':'Pulihkan'}</button></div><div class="mut" id="bmsg" style="margin-top:10px"></div></div>
+  ${widgetCard()}${catCard()}<div class="card row"><div class="ico" style="background:var(--chip)">📈</div><div><div class="name">${S.habits.length} kebiasaan</div><div class="mut">${S.cats.length} kategori</div></div></div>`}
+
+/* BUG-002: sinkronisasi form dipanggil di awal SETIAP aksi + live saat mengetik */
+function syncForm(){const g=i=>$('#'+i);
+  if(S.form){const f=S.form;if(g('fname'))f.name=g('fname').value;if(g('fnew'))f.newCat=g('fnew').value;if(g('fmini'))f.mini=g('fmini').value;if(g('fstack'))f.stack=g('fstack').value}
+  if(S.nf){if(g('ntitle'))S.nf.title=g('ntitle').value;if(g('nbody'))S.nf.body=g('nbody').value}}
+document.addEventListener('input',e=>{if(e.target.id==='wrtext'){S.reviews[e.target.dataset.wk]=e.target.value;save();return}if(!S.form&&!S.nf)return;syncForm();if(S.nf)draftSave();if(e.target.id==='fname'){const p=$('#pvn');if(p)p.textContent=S.form.name||'Nama kebiasaan'}});
+
+/* RISK-002: ekspor dengan fallback aman */
+async function doExport(){const ta=$('#bk'),msg=$('#bmsg');
+  ta.value=JSON.stringify(dump());ta.focus();ta.select();let ok=false;
+  try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(ta.value);ok=true}}catch(e){}
+  if(!ok){try{ta.setSelectionRange(0,ta.value.length);ok=document.execCommand('copy')}catch(e){}}
+  msg.textContent=ok?'Data disalin ke clipboard ✓':'Tidak bisa menyalin otomatis. Teks sudah terpilih, salin manual (tekan lama › Salin).'}
+
+document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b)return;const a=b.dataset.a,v=b.dataset.v,id=+v,sk=S.sel;
+  syncForm();
+  const H=i=>S.habits.find(h=>h.id===i);
+  if(a!=='imp')disarm('impConfirm');if(a!=='wr-fill')disarm('wrConfirm');
+  if(a==='exp'){doExport();return}
+  if(a==='tab'){S.tab=v;S.form=null;S.nf=null;S.cdc=null;if(v==='me'||v==='sum')pushSnapshotFull()}
+  else if(a==='sel')S.sel=v;
+  else if(a==='mini'){const h=H(id);h.log[sk]='mini';stamp(h,sk);S.sheet=null;toast('⚡ Versi mini tercatat, streak aman!');nudge(h)}
+  else if(a==='life')S.sheet='life';
+  else if(a==='quick')S.sheet='quick';
+  else if(a==='qc'||a==='qcm'){const h=H(id),r=h?checkinToday(h,a==='qcm'?'mini':'done'):'na';toast(CHK_MSG[r]);
+    if(r==='ok'){S.sel=K(now());if(S._link)S.tab='today';setTimeout(()=>nudge(h,K(now())),100)}}
+  else if(a==='lnk'||a==='lnkq'){copyText(a==='lnk'?linkFor('checkin',id):linkFor('quick')).then(ok=>toast(ok?'Tautan disalin ✓':'Gagal menyalin tautan'));return}
+  else if(a==='pwa'){installApp();return}
+  else if(a==='swdl'){downloadSW();return}
+  else if(a==='qn'){S.qid=id;S.sheet='qn'}
+  else if(a==='ex')S.ex[id]=!S.ex[id];
+  else if(a==='fd'){const f=S.form,d=+v,l=(f.days||[0,1,2,3,4,5,6]).slice(),j=l.indexOf(d);
+    if(j>=0){if(l.length===1){toast('Pilih minimal 1 hari');return}l.splice(j,1)}else l.push(d);f.days=l}
+  else if(a==='catadd'){const n=$('#catnew').value.trim();if(!n){toast('Isi nama kategori');return}
+    if(S.cats.some(c=>c.toLowerCase()===n.toLowerCase())){toast('Kategori sudah ada');return}S.cats.push(n);toast('Kategori ditambahkan ✓')}
+  else if(a==='catdel'){const n=S.habits.filter(h=>h.cat===v).length;
+    if(n&&S.cdc!==v){S.cdc=v;toast('Tap lagi untuk memindahkan '+n+' kebiasaan ke Tanpa kategori')}
+    else{S.habits.forEach(h=>{if(h.cat===v)h.cat=''});S.cats=S.cats.filter(c=>c!==v);if(S.cat===v)S.cat='Semua';if(S.form&&S.form.cat===v)S.form.cat='';S.cdc=null;toast('Kategori dihapus')}}
+  else if(a==='qnsave'){const h=H(S.qid),tx=$('#qntext').value.trim();S.sheet=null;if(h){h.notes=h.notes||{};if(tx)h.notes[sk]=tx;else delete h.notes[sk];toast(tx?'Catatan tersimpan ✓':'Catatan dihapus')}}
+  else if(a==='freeze'){const r=$('#lreason');if(S.freezes[sk]){delete S.freezes[sk];toast('Freeze dibatalkan')}else if(freezeLeft()<1){toast('Freeze bulan ini sudah habis');return}else{S.freezes[sk]={reason:r?r.value.trim():''};toast('❄️ Streak dibekukan. Istirahat dulu 💙')}S.sheet=null}
+  else if(a==='hnote'){const h=H(id);S.nf={title:'Habit Log: '+h.name+' - '+fmtDate(sk),body:habitBlock(h)+'\n\n— Refleksi —\n',hid:h.id};S.sheet=null}
+  else if(a==='wr-fill'){const wk=wkKey();
+    if((S.reviews[wk]||'').trim()&&!S.wrConfirm){arm('wrConfirm');toast('Timpa refleksi? Tap lagi untuk mengisi draft');return}
+    disarm('wrConfirm');S.reviews[wk]=weeklyDraft(true);toast('Draft diisi ✓')}
+  else if(a==='wr')S.nf={title:'Review Mingguan - '+fmtDate(K(now())),body:weeklyDraft()};
+  else if(a==='nnew')S.nf={title:'',body:''};
+  else if(a==='nopen'){const n=S.notes.find(x=>x.id===id);n.views=(n.views||0)+1;S.nf={...n};S.cd=null}
+  else if(a==='ncancel')S.nf=null;
+  else if(a==='nsave'){const f=S.nf;if(!f.title.trim()&&!f.body.trim()){toast('Catatan masih kosong');return}
+    const n={id:f.id||Date.now(),title:f.title.trim()||'Tanpa judul',body:f.body,date:f.date||K(now()),views:f.views||0,hid:f.hid},i=S.notes.findIndex(x=>x.id===n.id);
+    if(i<0)S.notes.unshift(n);else S.notes[i]=n;S.nf=null;S.tab='notes';toast('Catatan tersimpan ✓')}
+  else if(a==='ndel'){if(S.cd!==id){S.cd=id;toast('Tap lagi untuk menghapus');return}S.notes=S.notes.filter(x=>x.id!==id);S.nf=null;S.cd=null;toast('Catatan dihapus')}
+  else if(a==='fs')S.form.stack=S.form.stack===v?'':v;
+  else if(a==='cat')S.cat=v;
+  else if(a==='tog'){const h=H(id);if(isDone(h.log[sk])){delete h.log[sk];if(h.times)delete h.times[sk]}else{h.log[sk]='done';stamp(h,sk);nudge(h)}}
+  else if(a==='menu'){S.sheet=id;S.cd=null}
+  else if(a==='close'){if(e.target!==b)return;S.sheet=null;S.cd=null}
+  else if(a==='off'){const h=H(id);if(h.log[sk]==='off')delete h.log[sk];else h.log[sk]='off';S.sheet=null;toast('Diperbarui')}
+  else if(a==='edit'){S.form={...H(id),newCat:''};S.sheet=null}
+  else if(a==='del'){if(S.cd!==id)S.cd=id;else{S.habits=S.habits.filter(h=>h.id!==id);S.sheet=null;S.cd=null;toast('Kebiasaan dihapus')}}
+  else if(a==='new')S.form={name:'',icon:ICONS[0],color:COLORS[0],repeat:'day',cat:S.cats[0]||'',newCat:'',days:[0,1,2,3,4,5,6]};
+  else if(a==='cancel')S.form=null;
+  else if(a==='fi')S.form.icon=v;
+  else if(a==='fc')S.form.color=v;
+  else if(a==='fr')S.form.repeat=v;
+  else if(a==='fk'){S.form.cat=v;S.form.newCat=''}
+  else if(a==='save'){const f=S.form;if(!f.name.trim()){const n=$('#fname');n.style.borderColor='var(--bad)';n.focus();return}
+    const cat=f.newCat.trim()||f.cat;if(cat&&!S.cats.includes(cat))S.cats.push(cat);
+    const d={name:f.name.trim(),icon:f.icon,color:f.color,repeat:f.repeat,cat,days:f.days||[0,1,2,3,4,5,6],mini:(f.mini||'').trim(),stack:(f.stack||'').trim()};
+    if(f.id)Object.assign(H(f.id),d);else S.habits.push({id:Date.now(),...d,start:K(now()),log:{}});
+    S.form=null;S.tab='today';toast('Tersimpan ✓')}
+  else if(a==='mo')S.mo=Math.min(0,S.mo+ +v);
+  else if(a==='login'){const n=$('#lname').value.trim(),m=$('#lmail').value.trim();if(!n||!m){toast('Isi nama & email');return}S.user={name:n,email:m}}
+  else if(a==='logout')S.user=null;
+  else if(a==='imp'){let d;
+    try{d=JSON.parse($('#bk').value);
+      if(!isObj(d)||!Array.isArray(d.habits))throw 0;
+      if(!d.habits.every(h=>isObj(h)&&h.id!=null&&h.id!==''&&typeof h.name==='string'&&h.log!==undefined&&(h.log===null||typeof h.log==='object')))throw 0
+    }catch(x){disarm('impConfirm');$('#bmsg').textContent='Data tidak valid.';b.textContent='Pulihkan';return}
+    if(!S.impConfirm){arm('impConfirm');b.textContent='Yakin? Tap lagi';$('#bmsg').textContent='';toast('Tap lagi untuk menimpa semua data');return}
+    disarm('impConfirm');
+    const n=normalize({cats:d.cats,habits:d.habits,user:d.user,notes:d.notes,freezes:d.freezes,reviews:d.reviews});
+    S.cats=n.cats;S.habits=n.habits;S.user=n.user;S.notes=n.notes;S.freezes=n.freezes;S.reviews=n.reviews;
+    S.cat='Semua';S.cdc=null;S.cd=null;S.sheet=null;S.nf=null;S.ex={};toast('Berhasil dipulihkan ✓')}
+  if(S.sheet!=='qn')S.qid=null;else if(!H(S.qid)){S.sheet=null;S.qid=null}
+  if(S.sheet!=='quick')S._link=0;
+  if(!S.nf)draftClear();
+  save();render()});
+setupPwa();setupSW();
+const _lm=handleLink(),_rs=draftRestore();render();pushSnapshotFull();if(_rs)toast('Draft catatan dipulihkan');if(_lm)setTimeout(()=>toast(_lm),_rs?1900:0);
+</script>
+</body>
+</html>
