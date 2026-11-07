@@ -355,10 +355,7 @@ function cloudCard(){
     return`<div class="card"><div class="name">☁️ Cloud</div><div class="mut" style="margin:4px 0 12px">Masuk sebagai ${esc(_cu)}<br>Terakhir sinkron: ${at?esc(new Date(at).toLocaleString('id-ID')):'belum pernah'}${cloudDirty()?'<br>Ada perubahan yang belum terkirim':''}</div>
     <div style="display:grid;gap:10px"><button class="btn p" data-a="csync">Sinkron sekarang</button>${_ccloud?`<button class="btn" data-a="cask">Selesaikan data berbeda</button>`:''}${bk?`<button class="btn" data-a="crestore">Pulihkan cadangan sebelum sinkron</button>`:''}<button class="btn" data-a="cout">Keluar dari cloud</button></div>
     <div class="mut" id="cstat" role="status" style="margin-top:8px">${esc(_cstat)}</div><div class="mut" id="cmsg" role="status"></div></div>`}
-  return`<div class="card"><div class="name">☁️ Login & sinkronisasi</div><div class="mut" style="margin:4px 0 12px">Masuk atau buat akun. Konfigurasi cloud sudah disiapkan, jadi tidak perlu memasukkan URL atau API key.</div>
-  <div style="display:grid;gap:10px"><input type="email" id="ce" placeholder="Email" autocomplete="email" aria-label="Email"><input type="password" id="cp" placeholder="Kata sandi (min. 6 karakter)" autocomplete="current-password" aria-label="Kata sandi">
-  <button class="btn p" data-a="cin">Masuk</button><button class="btn" data-a="cup">Daftar akun baru</button><button class="btn" data-a="cml">Kirim tautan masuk ke email</button></div>
-  <div class="mut" id="cmsg" role="status" style="margin-top:8px"></div></div>`}
+  return`<div class="card"><div class="name">☁️ Sinkronisasi cloud</div><div class="mut" style="margin-top:6px">Masuk melalui formulir akun di bagian atas untuk mengaktifkan pencadangan dan sinkronisasi.</div></div>`}
 
 function sched(h,d){const s=P(h.start);if(d<s)return false;
   if(h.repeat==='day')return !h.days||!h.days.length||h.days.includes(d.getDay());
@@ -553,11 +550,12 @@ function sumV(){
    ${S.ex[h.id]?`<div class="cal">${DAYS.map(x=>`<i>${x[0]}</i>`).join('')}${'<span></span>'.repeat(b.getDay())}${cells}</div>`:''}
    <div class="stats" style="margin-top:${S.ex[h.id]?0:14}px"><div class="st"><b style="color:var(--acc)">${s.streakPct}%</b><span>Streak Saat Ini<br>${s.streak} periode</span></div><div class="st"><b style="color:var(--ok)">${s.fin}%</b><span>Kebiasaan Selesai<br>bulan ini</span></div><div class="st"><b style="color:#f97316">${s.cr}%</b><span>Tingkat<br>Penyelesaian</span></div></div></div>`}).join('')}`}
 
-function meV(){const u=S.user||(_cu?{name:_cu.split('@')[0]||'?',email:_cu}:null);
-  return`<h1 style="margin-bottom:18px">Saya</h1>
-  <div class="card"><div class="row"><div class="ico" style="background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff;border-radius:50%;font-weight:800">${u?esc(u.name[0].toUpperCase()):'?'}</div>
-  <div class="grow"><div class="name">${u?esc(u.name):'Tamu'}</div><div class="mut">${u?esc(u.email)+(_cu?'':' · profil lokal'):'Belum masuk'}</div></div></div>
-  ${u?`<button class="btn" style="margin-top:14px" data-a="logout">Keluar</button>`:cloudCfg()?`<div class="mut" style="margin-top:12px">Masuk lewat kartu ☁️ Cloud di bawah.</div>`:`<div style="margin-top:16px;display:grid;gap:10px"><input type="text" id="lname" placeholder="Nama"><input type="email" id="lmail" placeholder="Email"><button class="btn p" data-a="login">Masuk</button><div class="mut">Profil lokal saja, tidak terhubung ke cloud. Untuk cloud pakai kartu ☁️ Cloud di bawah.</div></div>`}</div>
+function meV(){
+  return`<h1 style="margin-bottom:18px">Akun</h1>
+  <div class="card"><div class="name">🔐 ${_cu?'Akun Habitly':'Masuk ke Habitly'}</div>
+  ${_cu?`<div class="mut" style="margin-top:8px">Masuk sebagai <b>${esc(_cu)}</b></div><button class="btn" style="margin-top:14px" data-a="cout">Keluar</button>`:`<div class="mut" style="margin:4px 0 12px">Gunakan email dan kata sandi untuk masuk atau membuat akun.</div>
+  <div style="display:grid;gap:10px"><input type="email" id="ce" placeholder="Alamat email" autocomplete="email" aria-label="Alamat email"><input type="password" id="cp" placeholder="Kata sandi" autocomplete="current-password" aria-label="Kata sandi">
+  <button class="btn p" data-a="cin">Masuk</button><button class="btn" data-a="cup">Buat akun baru</button><div class="mut" id="cmsg" role="status"></div></div>`}</div>
   <div class="card"><div class="name">☁️ Cadangan</div><div class="mut" style="margin:4px 0 12px">Salin data untuk disimpan, atau tempel untuk memulihkan.</div>
   <textarea id="bk" rows="4" style="font-size:12px;box-shadow:none;background:var(--chip)" placeholder="Data cadangan…"></textarea>
   <div class="row" style="margin-top:12px;gap:10px"><button class="btn p" data-a="exp">Ekspor</button><button class="btn" data-a="imp">${S.impConfirm?'Yakin? Tap lagi':'Pulihkan'}</button></div><div class="mut" id="bmsg" style="margin-top:10px"></div></div>
