@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Habitly – Habit Tracker</title>
 <meta name="theme-color" content="#6c5ce7">
+<link rel="manifest" href="./manifest.webmanifest">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -194,30 +195,19 @@ function iconPng(z){const c=document.createElement('canvas');c.width=c.height=z;
   g.addColorStop(0,'#6c5ce7');g.addColorStop(1,'#a78bfa');x.fillStyle=g;x.fillRect(0,0,z,z);x.strokeStyle='#fff';x.lineWidth=z*.1;x.lineCap='round';x.lineJoin='round';
   x.beginPath();x.moveTo(z*.3,z*.52);x.lineTo(z*.44,z*.66);x.lineTo(z*.71,z*.35);x.stroke();return c.toDataURL('image/png')}
 let _swOk=false;
-function setupSW(){if(!HOSTED||!('serviceWorker' in navigator))return;
-  const SW_SRC=`const C='habitly-v3';
-self.addEventListener('install',e=>{self.skipWaiting()});
-self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
-self.addEventListener('fetch',e=>{const r=e.request;if(r.method!=='GET'||!/^https?:/.test(r.url))return;
-  const u=new URL(r.url),k=r.mode==='navigate'?u.origin+u.pathname:r;
-  e.respondWith(caches.open(C).then(c=>c.match(k).then(hit=>{
-    const net=fetch(r).then(res=>{if(res&&res.ok&&res.type==='basic')c.put(k,res.clone());return res});
-    if(hit){e.waitUntil(net.catch(()=>{}));return hit}
-    return net})))});`;
-  SW_SRC_CACHE=SW_SRC;
-  const ok=()=>{_swOk=true},ext=()=>fetch('sw.js',{method:'HEAD',cache:'no-store'}).then(r=>{
-    if(r.ok&&/javascript/.test(r.headers.get('content-type')||''))return navigator.serviceWorker.register('sw.js').then(ok)}).catch(()=>{});
-  try{navigator.serviceWorker.register(URL.createObjectURL(new Blob([SW_SRC],{type:'text/javascript'}))).then(ok).catch(ext)}catch(e){ext()}}
+function setupSW(){
+  if(!HOSTED||!('serviceWorker' in navigator))return;
+  navigator.serviceWorker.register('./sw.js')
+    .then(()=>{_swOk=true;})
+    .catch(err=>console.warn('PWA service worker:',err));
+}
 let SW_SRC_CACHE='';
 function downloadSW(){try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([SW_SRC_CACHE],{type:'text/javascript'}));a.download='sw.js';document.body.appendChild(a);a.click();a.remove();toast('sw.js diunduh ✓')}catch(e){toast('Gagal mengunduh sw.js')}}
-function setupPwa(){try{const add=(rel,href)=>{const l=document.createElement('link');l.rel=rel;l.href=href;document.head.appendChild(l)};
-    add('apple-touch-icon',iconPng(180));if(!HOSTED)return;
-    const base=BASE(),i1=iconPng(192),i2=iconPng(512);
-    const m={name:'Habitly',short_name:'Habitly',description:'Habit tracker yang tidak bikin kamu merasa gagal.',lang:'id',
-      start_url:base+'?src=pwa',scope:base.replace(/[^/]*$/,''),display:'standalone',background_color:'#f5f4fb',theme_color:'#6c5ce7',
-      icons:[{src:i1,sizes:'192x192',type:'image/png',purpose:'any'},{src:i2,sizes:'512x512',type:'image/png',purpose:'any'},{src:i2,sizes:'512x512',type:'image/png',purpose:'maskable'}],
-      shortcuts:[{name:'Check-in cepat',short_name:'Check-in',url:base+'?a=quick&src=shortcut'}]};
-    add('manifest',URL.createObjectURL(new Blob([JSON.stringify(m)],{type:'application/manifest+json'})))}catch(e){}}
+function setupPwa(){
+  try{const add=(rel,href)=>{const l=document.createElement('link');l.rel=rel;l.href=href;document.head.appendChild(l)};
+    add('apple-touch-icon','./icons/icon-192.svg');
+  }catch(e){}
+}
 function quickSheet(){const t=now(),tk=K(t),l=S.habits.filter(h=>sched(h,t)&&val(h,tk)!=='off'&&!isDone(h.log[tk]));
   return`<div class='sheetbg' data-a='close'><div class='sheet' role='dialog' aria-label='Check-in cepat'><div class='bar'></div><div class='name' style='font-size:18px'>⚡ Check-in cepat</div><div class='mut'>${fmtDate(tk)} · ketuk untuk menandai selesai</div>
   ${l.length?l.map(h=>`<div class='row' style='gap:8px'><button class='btn grow' style='text-align:left;padding:16px' data-a='qc' data-v='${h.id}' aria-label='Selesai: ${esc(h.name)}'>${esc(h.icon)} ${esc(h.name)}</button>${h.mini?`<button class='btn' style='width:auto;padding:16px' data-a='qcm' data-v='${h.id}' aria-label='Versi mini: ${esc(h.name)}'>⚡</button>`:''}</div>`).join(''):`<div class='nb'>🎉 Semua kebiasaan hari ini sudah beres.</div>`}
@@ -227,7 +217,6 @@ function widgetCard(){const std=(window.matchMedia&&matchMedia('(display-mode: s
   <button class="btn p" data-a="quick">⚡ Buka check-in cepat</button>
   <button class="btn" style="margin-top:10px" data-a="pwa">${std?'Sudah terpasang ✓':'Pasang ke layar utama'}</button>
   <div class="mut" style="margin-top:10px">iPhone: Safari › Bagikan › Tambah ke Layar Utama. Android: menu ⋮ › Instal aplikasi.</div>
-  ${HOSTED&&!_swOk?`<div class="mut" style="margin-top:8px">Agar tombol pasang & mode offline aktif di Chrome, simpan sw.js di folder yang sama dengan file ini lalu muat ulang.</div><button class="btn" style="margin-top:8px" data-a="swdl">Unduh sw.js</button>`:''}
   ${HOSTED?'':`<div class="mut" style="margin-top:8px">⚠️ Tautan pintasan baru berfungsi jika file ini di-hosting lewat HTTPS.</div>`}
   <div class="l" style="margin:18px 0 8px">Tautan pintasan</div>
   <button class="btn" data-a="lnkq">Salin tautan check-in cepat</button>
