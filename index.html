@@ -226,10 +226,9 @@ function widgetCard(){const std=(window.matchMedia&&matchMedia('(display-mode: s
 /* ===== CLOUD (Supabase): login + sinkron user_data =====
    Aturan: data perangkat TIDAK pernah ditimpa tanpa cadangan; konflik selalu minta keputusan pengguna. */
 var _sbc=null,_cu=null,_cdt=null,_cbusy=false,_cpull=false,_cchk=true,_ccloud=null,_cstat='';
-const SB_DEFAULT={url:'',key:''};   // opsional: isi di sini agar tidak perlu mengetik di aplikasi
+const SB_DEFAULT={url:'https://wycusjdjojlqezixayhx.supabase.co',key:'sb_publishable_L8kklXC7sJ7wUrnbCxo-2Q_HbhESPBQ'}; // konfigurasi publik aplikasi
 const SB_URL_RE=/^https:\/\/[a-z0-9-]+\.supabase\.(?:co|in)/;
-function cloudCfg(){let c=null;try{c=JSON.parse(localStorage.getItem('habitly_sb')||'null')}catch(e){}
-  if(!c||!c.url)c=SB_DEFAULT;return c&&SB_URL_RE.test(c.url||'')&&c.key?c:null}
+function cloudCfg(){return SB_DEFAULT.url&&SB_DEFAULT.key?SB_DEFAULT:null}
 function keyOk(k){if(typeof k!=='string'||k.length<20)return'Kunci tidak valid.';
   if(/^sb_secret_/.test(k))return'Itu kunci rahasia. Pakai anon/publishable key.';
   if(k.startsWith('eyJ')){try{const p=JSON.parse(atob(k.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
@@ -350,17 +349,15 @@ function cSheet(){const r=_ccloud,nc=r&&isObj(r.data)&&Array.isArray(r.data.habi
   <button class='btn' style='margin-top:10px' data-a='ccloudu'>Pakai data cloud</button>
   <button class='btn' style='margin-top:10px' data-a='cdev'>Pakai data perangkat ini</button>
   <button class='btn' style='margin-top:10px' data-a='close'>Tunda</button></div></div>`}
-function cloudCard(){const c=cloudCfg();
-  if(!c)return`<div class="card"><div class="name">☁️ Cloud</div><div class="mut" style="margin:4px 0 12px">Hubungkan Supabase untuk cadangan dan sinkron antar perangkat. Ambil dari Supabase › Project Settings › API.</div>
-  <div style="display:grid;gap:10px"><input type="text" id="cu" placeholder="Project URL (https://xxxx.supabase.co)" autocomplete="off" aria-label="Project URL"><input type="text" id="ck" placeholder="Anon public key" autocomplete="off" aria-label="Anon public key"><button class="btn p" data-a="ccfg">Simpan konfigurasi</button></div><div class="mut" id="cmsg" role="status" style="margin-top:8px"></div></div>`;
-  if(_cchk)return`<div class="card"><div class="name">☁️ Cloud</div><div class="mut" style="margin-top:4px">Memeriksa sesi…</div></div>`;
+function cloudCard(){ 
+  if(_cchk)return`<div class="card"><div class="name">☁️ Cloud</div><div class="mut" style="margin-top:4px">Menghubungkan layanan akun…</div></div>`;
   if(_cu){const at=localStorage.getItem('habitly_sync_at'),bk=backupGet();
     return`<div class="card"><div class="name">☁️ Cloud</div><div class="mut" style="margin:4px 0 12px">Masuk sebagai ${esc(_cu)}<br>Terakhir sinkron: ${at?esc(new Date(at).toLocaleString('id-ID')):'belum pernah'}${cloudDirty()?'<br>Ada perubahan yang belum terkirim':''}</div>
     <div style="display:grid;gap:10px"><button class="btn p" data-a="csync">Sinkron sekarang</button>${_ccloud?`<button class="btn" data-a="cask">Selesaikan data berbeda</button>`:''}${bk?`<button class="btn" data-a="crestore">Pulihkan cadangan sebelum sinkron</button>`:''}<button class="btn" data-a="cout">Keluar dari cloud</button></div>
     <div class="mut" id="cstat" role="status" style="margin-top:8px">${esc(_cstat)}</div><div class="mut" id="cmsg" role="status"></div></div>`}
-  return`<div class="card"><div class="name">☁️ Cloud</div><div class="mut" style="margin:4px 0 12px">Masuk atau daftar untuk menyimpan data ke cloud. Data di perangkat ini tidak akan dihapus.</div>
+  return`<div class="card"><div class="name">☁️ Login & sinkronisasi</div><div class="mut" style="margin:4px 0 12px">Masuk atau buat akun. Konfigurasi cloud sudah disiapkan, jadi tidak perlu memasukkan URL atau API key.</div>
   <div style="display:grid;gap:10px"><input type="email" id="ce" placeholder="Email" autocomplete="email" aria-label="Email"><input type="password" id="cp" placeholder="Kata sandi (min. 6 karakter)" autocomplete="current-password" aria-label="Kata sandi">
-  <button class="btn p" data-a="cin">Masuk</button><button class="btn" data-a="cup">Daftar akun baru</button><button class="btn" data-a="cml">Kirim tautan masuk ke email</button><button class="btn" style="font-size:12px;padding:8px" data-a="crst">Ganti konfigurasi Supabase</button></div>
+  <button class="btn p" data-a="cin">Masuk</button><button class="btn" data-a="cup">Daftar akun baru</button><button class="btn" data-a="cml">Kirim tautan masuk ke email</button></div>
   <div class="mut" id="cmsg" role="status" style="margin-top:8px"></div></div>`}
 
 function sched(h,d){const s=P(h.start);if(d<s)return false;
