@@ -226,10 +226,9 @@ function widgetCard(){const std=(window.matchMedia&&matchMedia('(display-mode: s
 /* ===== CLOUD (Supabase): login + sinkron user_data =====
    Aturan: data perangkat TIDAK pernah ditimpa tanpa cadangan; konflik selalu minta keputusan pengguna. */
 var _sbc=null,_cu=null,_cdt=null,_cbusy=false,_cpull=false,_cchk=true,_ccloud=null,_cstat='';
-const SB_DEFAULT={url:'',key:''};   // opsional: isi di sini agar tidak perlu mengetik di aplikasi
+const SB_DEFAULT={url:'https://wycusjdjojlqezixayhx.supabase.co',key:'sb_publishable_L8kklXC7sJ7wUrnbCxo-2Q_HbhESPBQ'}; // konfigurasi publik aplikasi
 const SB_URL_RE=/^https:\/\/[a-z0-9-]+\.supabase\.(?:co|in)/;
-function cloudCfg(){let c=null;try{c=JSON.parse(localStorage.getItem('habitly_sb')||'null')}catch(e){}
-  if(!c||!c.url)c=SB_DEFAULT;return c&&SB_URL_RE.test(c.url||'')&&c.key?c:null}
+function cloudCfg(){return SB_DEFAULT.url&&SB_DEFAULT.key?SB_DEFAULT:null}
 function keyOk(k){if(typeof k!=='string'||k.length<20)return'Kunci tidak valid.';
   if(/^sb_secret_/.test(k))return'Itu kunci rahasia. Pakai anon/publishable key.';
   if(k.startsWith('eyJ')){try{const p=JSON.parse(atob(k.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
@@ -350,18 +349,13 @@ function cSheet(){const r=_ccloud,nc=r&&isObj(r.data)&&Array.isArray(r.data.habi
   <button class='btn' style='margin-top:10px' data-a='ccloudu'>Pakai data cloud</button>
   <button class='btn' style='margin-top:10px' data-a='cdev'>Pakai data perangkat ini</button>
   <button class='btn' style='margin-top:10px' data-a='close'>Tunda</button></div></div>`}
-function cloudCard(){const c=cloudCfg();
-  if(!c)return`<div class="card"><div class="name">☁️ Cloud</div><div class="mut" style="margin:4px 0 12px">Hubungkan Supabase untuk cadangan dan sinkron antar perangkat. Ambil dari Supabase › Project Settings › API.</div>
-  <div style="display:grid;gap:10px"><input type="text" id="cu" placeholder="Project URL (https://xxxx.supabase.co)" autocomplete="off" aria-label="Project URL"><input type="text" id="ck" placeholder="Anon public key" autocomplete="off" aria-label="Anon public key"><button class="btn p" data-a="ccfg">Simpan konfigurasi</button></div><div class="mut" id="cmsg" role="status" style="margin-top:8px"></div></div>`;
-  if(_cchk)return`<div class="card"><div class="name">☁️ Cloud</div><div class="mut" style="margin-top:4px">Memeriksa sesi…</div></div>`;
+function cloudCard(){ 
+  if(_cchk)return`<div class="card"><div class="name">☁️ Cloud</div><div class="mut" style="margin-top:4px">Menghubungkan layanan akun…</div></div>`;
   if(_cu){const at=localStorage.getItem('habitly_sync_at'),bk=backupGet();
     return`<div class="card"><div class="name">☁️ Cloud</div><div class="mut" style="margin:4px 0 12px">Masuk sebagai ${esc(_cu)}<br>Terakhir sinkron: ${at?esc(new Date(at).toLocaleString('id-ID')):'belum pernah'}${cloudDirty()?'<br>Ada perubahan yang belum terkirim':''}</div>
     <div style="display:grid;gap:10px"><button class="btn p" data-a="csync">Sinkron sekarang</button>${_ccloud?`<button class="btn" data-a="cask">Selesaikan data berbeda</button>`:''}${bk?`<button class="btn" data-a="crestore">Pulihkan cadangan sebelum sinkron</button>`:''}<button class="btn" data-a="cout">Keluar dari cloud</button></div>
     <div class="mut" id="cstat" role="status" style="margin-top:8px">${esc(_cstat)}</div><div class="mut" id="cmsg" role="status"></div></div>`}
-  return`<div class="card"><div class="name">☁️ Cloud</div><div class="mut" style="margin:4px 0 12px">Masuk atau daftar untuk menyimpan data ke cloud. Data di perangkat ini tidak akan dihapus.</div>
-  <div style="display:grid;gap:10px"><input type="email" id="ce" placeholder="Email" autocomplete="email" aria-label="Email"><input type="password" id="cp" placeholder="Kata sandi (min. 6 karakter)" autocomplete="current-password" aria-label="Kata sandi">
-  <button class="btn p" data-a="cin">Masuk</button><button class="btn" data-a="cup">Daftar akun baru</button><button class="btn" data-a="cml">Kirim tautan masuk ke email</button><button class="btn" style="font-size:12px;padding:8px" data-a="crst">Ganti konfigurasi Supabase</button></div>
-  <div class="mut" id="cmsg" role="status" style="margin-top:8px"></div></div>`}
+  return`<div class="card"><div class="name">☁️ Sinkronisasi cloud</div><div class="mut" style="margin-top:6px">Masuk melalui formulir akun di bagian atas untuk mengaktifkan pencadangan dan sinkronisasi.</div></div>`}
 
 function sched(h,d){const s=P(h.start);if(d<s)return false;
   if(h.repeat==='day')return !h.days||!h.days.length||h.days.includes(d.getDay());
@@ -556,11 +550,12 @@ function sumV(){
    ${S.ex[h.id]?`<div class="cal">${DAYS.map(x=>`<i>${x[0]}</i>`).join('')}${'<span></span>'.repeat(b.getDay())}${cells}</div>`:''}
    <div class="stats" style="margin-top:${S.ex[h.id]?0:14}px"><div class="st"><b style="color:var(--acc)">${s.streakPct}%</b><span>Streak Saat Ini<br>${s.streak} periode</span></div><div class="st"><b style="color:var(--ok)">${s.fin}%</b><span>Kebiasaan Selesai<br>bulan ini</span></div><div class="st"><b style="color:#f97316">${s.cr}%</b><span>Tingkat<br>Penyelesaian</span></div></div></div>`}).join('')}`}
 
-function meV(){const u=S.user||(_cu?{name:_cu.split('@')[0]||'?',email:_cu}:null);
-  return`<h1 style="margin-bottom:18px">Saya</h1>
-  <div class="card"><div class="row"><div class="ico" style="background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff;border-radius:50%;font-weight:800">${u?esc(u.name[0].toUpperCase()):'?'}</div>
-  <div class="grow"><div class="name">${u?esc(u.name):'Tamu'}</div><div class="mut">${u?esc(u.email)+(_cu?'':' · profil lokal'):'Belum masuk'}</div></div></div>
-  ${u?`<button class="btn" style="margin-top:14px" data-a="logout">Keluar</button>`:cloudCfg()?`<div class="mut" style="margin-top:12px">Masuk lewat kartu ☁️ Cloud di bawah.</div>`:`<div style="margin-top:16px;display:grid;gap:10px"><input type="text" id="lname" placeholder="Nama"><input type="email" id="lmail" placeholder="Email"><button class="btn p" data-a="login">Masuk</button><div class="mut">Profil lokal saja, tidak terhubung ke cloud. Untuk cloud pakai kartu ☁️ Cloud di bawah.</div></div>`}</div>
+function meV(){
+  return`<h1 style="margin-bottom:18px">Akun</h1>
+  <div class="card"><div class="name">🔐 ${_cu?'Akun Habitly':'Masuk ke Habitly'}</div>
+  ${_cu?`<div class="mut" style="margin-top:8px">Masuk sebagai <b>${esc(_cu)}</b></div><button class="btn" style="margin-top:14px" data-a="cout">Keluar</button>`:`<div class="mut" style="margin:4px 0 12px">Gunakan email dan kata sandi untuk masuk atau membuat akun.</div>
+  <div style="display:grid;gap:10px"><input type="email" id="ce" placeholder="Alamat email" autocomplete="email" aria-label="Alamat email"><input type="password" id="cp" placeholder="Kata sandi" autocomplete="current-password" aria-label="Kata sandi">
+  <button class="btn p" data-a="cin">Masuk</button><button class="btn" data-a="cup">Buat akun baru</button><div class="mut" id="cmsg" role="status"></div></div>`}</div>
   <div class="card"><div class="name">☁️ Cadangan</div><div class="mut" style="margin:4px 0 12px">Salin data untuk disimpan, atau tempel untuk memulihkan.</div>
   <textarea id="bk" rows="4" style="font-size:12px;box-shadow:none;background:var(--chip)" placeholder="Data cadangan…"></textarea>
   <div class="row" style="margin-top:12px;gap:10px"><button class="btn p" data-a="exp">Ekspor</button><button class="btn" data-a="imp">${S.impConfirm?'Yakin? Tap lagi':'Pulihkan'}</button></div><div class="mut" id="bmsg" style="margin-top:10px"></div></div>
